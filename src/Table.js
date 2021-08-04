@@ -1,8 +1,8 @@
 import { useBlockLayout, useFilters, useResizeColumns, useTable } from "react-table";
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 export default function Table(props) {
-    const columns = useMemo(() => props.columns, [props.columns])
+    const tableColumns = useMemo(() => props.columns, [props.columns])
     const data = useMemo(() => props.data, [props.data])
 
     const FILTER_COLUMN_CONFIG = {
@@ -16,11 +16,11 @@ export default function Table(props) {
       };
 
       function SelectColumnFilter(data) {
-          console.log(data)
+          // console.log(data)
         return (
           <div
             onClick={() => {
-              data.column.setFilter(["Casey", "Sheff"]);
+              data.column.setFilter(["swyman7@dot.gov"]);
             }}
           >
             Filter me
@@ -51,15 +51,17 @@ export default function Table(props) {
         prepareRow,
         headerGroups,
         state,
+        setAllFilters,
+        allColumns
     } = useTable({
         defaultColumn:FILTER_COLUMN_CONFIG,
         data: data,
-        columns: columns,
+        columns: tableColumns,
         filterTypes,
     },useFilters,useResizeColumns,useBlockLayout)
     return (
         <React.Fragment>
-            {state.filters && state.filters.length>0 && <ShowFilters/>}
+            {state.filters && state.filters.length>0 && <ShowAppliedFilters state={state} setAllFilters={setAllFilters} allColumns={allColumns}/>}
             
         <table {...getTableProps} >
             {console.log(state)}
@@ -95,6 +97,41 @@ export default function Table(props) {
     );
 }
 
-const ShowFilters = () => {
-    return <div>Filters Applicable</div>
+const ShowAppliedFilters = (props) => {
+    const [filtersToDisplay,setFiltersToDisplay] = useState([])
+    useEffect(()=>{
+      if(props.state && props.state.filters) {
+        setFiltersToDisplay(props.state.filters)
+      }
+    },[props.state])
+    
+    const removeAppliedFilter = (event) => {
+      // console.log(event.target.id,event.target.innerText)
+      let filterId = event.target.id;
+      let filterValue = event.target.innerText;
+      let allFiltersArr = filtersToDisplay
+      allFiltersArr.forEach(filter => {
+        if(filter.id===filterId) {
+          let updatedValuesArray = filter.value.filter(val => val.toString()!==filterValue.toString())
+            filter.value = updatedValuesArray
+        }
+      })
+      let newFilters = allFiltersArr.filter(val => val.value.length!==0)
+      props.setAllFilters(newFilters)
+    }
+
+    return <div>
+      {
+        filtersToDisplay.map((filter) => {
+          return <div>
+            <span>{props.allColumns.find(col => col.id===filter.id).Header}:</span>
+            <ul>
+              {filter.value.map(filterVal => {
+                return <li key={filterVal} id={filter.id} onClick={(e) => removeAppliedFilter(e)}>{filterVal}</li>
+              })}
+            </ul>
+          </div>
+        })
+      }
+    </div>
 }
