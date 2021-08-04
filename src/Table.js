@@ -1,4 +1,4 @@
-import { useFilters, useTable } from "react-table";
+import { useBlockLayout, useFilters, useResizeColumns, useTable } from "react-table";
 import React, { useMemo } from 'react';
 
 export default function Table(props) {
@@ -16,7 +16,7 @@ export default function Table(props) {
       };
 
       function SelectColumnFilter(data) {
-        //   console.log(data)
+          console.log(data)
         return (
           <div
             onClick={() => {
@@ -55,19 +55,25 @@ export default function Table(props) {
         defaultColumn:FILTER_COLUMN_CONFIG,
         data: data,
         columns: columns,
-        filterTypes
-    },useFilters)
+        filterTypes,
+    },useFilters,useResizeColumns,useBlockLayout)
     return (
         <React.Fragment>
             {state.filters && state.filters.length>0 && <ShowFilters/>}
             
-        <table {...getTableProps} style={{ width: "100%" }}>
+        <table {...getTableProps} >
             {console.log(state)}
             <thead>
                 {headerGroups.map(headerGroup =>
                     <tr {...headerGroup.getHeaderGroupProps}>
                         {headerGroup.headers.map(header =>
-                            <th {...header.getHeaderProps}>{header.render('Header')}&nbsp;{header.isFilterEnabled && header.render('Filter')}</th>
+                            <th {...header.getHeaderProps}>{header.render('Header')}&nbsp;{header.isFilterEnabled && (header.render('Filter'))}
+                            {header.isResizable && (
+                  <div
+                    {...header.getResizerProps()}
+                  >R</div>
+                )}
+                            </th>
                         )}
                     </tr>
                 )}

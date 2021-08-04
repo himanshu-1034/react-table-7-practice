@@ -7,6 +7,8 @@ export default function App() {
         {
             Header:"ID",
             accessor:"id",
+            isFilterEnabled:true,
+            Filter: MyFilter
         },
         {
             Header:"FIRST NAME",
@@ -15,7 +17,8 @@ export default function App() {
         },
         {
             Header:"EMAIL",
-            accessor:"email"
+            accessor:"email",
+            isFilterEnabled:true,
         },
     ]
   return (
@@ -25,3 +28,7 @@ export default function App() {
   );
 }
 
+
+const MyFilter = ({column}) => {
+    return <div onClick={()=> column.setFilter([3,8])}>Helllllllllllo</div>
+}
